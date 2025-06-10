@@ -1,0 +1,81 @@
+ <div class="col-md-12">
+  
+    <div class="form-section ">
+      <form class="row g-3 align-items-center" [formGroup]="form" >
+        <div class="col-md-4">
+          <label class="form-label m-2">Classe C da rede a varrer:</label>
+          <input type="text" class="form-control m-2" formControlName="IpRede">
+          <small class="text-muted">Formato: 255.255.255</small>
+          <small class="text-warning" *ngIf="form.controls.IpRede.invalid && form.controls.IpRede.touched">Campo deve ser preenchido</small>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Range de IPs para varrer:</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="VarrerTodaRede" formControlName="VarrerTodaRede">
+            <label class="form-check-label" for="VarrerTodaRede">Varrer toda sub-rede</label>
+          </div>
+          <div class="d-flex align-items-center mt-2">
+            <label class="me-2">ou Início:</label>
+            <input type="number" class="form-control w-25 me-2"  formControlName="inicio">
+             <small class="text-warning" *ngIf="form.controls.inicio.invalid && form.controls.inicio.touched">Campo deve ser preenchido</small>
+            <label class="me-2">Fim:</label>
+            <input type="number" class="form-control w-25" formControlName="fim">
+             <small class="text-warning" *ngIf="form.controls.fim.invalid && form.controls.fim.touched">Campo deve ser preenchido</small>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-flex"> 
+          <div class="col-md-3">
+            <p>Versão 0: <br>sem threads</p>
+            <button class="btn btn-primary btn-sm" (click)="onSubmit(0)">Iniciar</button>
+            
+          </div>
+          <div class="col-md-3">
+            <p>Versão 1:<br> single thread</p>
+            <button class="btn btn-primary btn-sm" (click)="onSubmit(1)">Iniciar</button>
+            
+          </div>
+          <div class="col-md-3">
+            <p>Versão 2:<br> multi threads</p>
+            <button class="btn btn-primary btn-sm" (click)="onSubmit(2)">Iniciar</button>
+            
+          </div>
+          <div class="col-md-3">
+            <p>Versão 3: multi threads dinâmicas</p> <!--se a quantidade de trheads for igual a 7 é multithreads dinamicas-->
+             <button class="btn btn-primary btn-sm" (click)="onSubmit(7)">Iniciar</button> 
+           
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="table-responsive-scroll">
+      <table class="table table-striped table-hover"> <thead>
+          <tr>
+            <th scope="col">IP</th>
+            <th scope="col">Estado de ativação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border">
+            <td>10.3.192.1</td>
+            <td>Ativo</td>
+          </tr>
+          <tr class="border">
+            <td>10.3.192.2</td>
+            <td>Inativo</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+
+
+    <div class="status-bar mt-3">
+      Status sua rede: <strong>não identificado</strong> | Progresso varredura: &nbsp;&nbsp;&nbsp;&nbsp;Concluído em: 9 seg. Timer fechado
+    </div>
+  </div>
+

@@ -1,0 +1,22 @@
+*{
+  overflow-x: hidden;
+}
+ .table-responsive-scroll {
+      height: 65vh;
+      overflow-y: auto; 
+      
+    }
+
+    
+    .table-responsive-scroll table thead {
+      position: sticky;
+      top: 0;
+      background-color: white; 
+      z-index: 1; 
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); 
+    }
+
+   
+    .table td, .table th {
+        white-space: nowrap; 
+    }
