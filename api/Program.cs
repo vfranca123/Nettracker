@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+
+using Microsoft.OpenApi.Models; // IMPORTANTE para Swagger
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +18,32 @@ builder.Services.AddCors(options =>
         });
 });
 
+// 3. Adiciona suporte ao Swagger (interface gráfica para testes)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minha API", Version = "v1" });
+});
+
+// 4. Constrói o app
 var app = builder.Build();
 
-// 3. Usa o CORS com a política definida
+// 5. Ativa o Swagger em ambiente de desenvolvimento
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minha API v1");
+    });
+}
+
+// 6. Usa o CORS com a política definida
 app.UseCors("AllowAngularApp");
 
-// 4. Usa roteamento de controladores (para que as rotas tipo /api/rede funcionem)
+// 7. Usa roteamento de controladores
 app.MapControllers();
 
-// 5. Inicia o servidor
+// 8. Inicia o servidor
 app.Run();
+

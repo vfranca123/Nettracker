@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { from } from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
@@ -13,8 +12,7 @@ import { from } from 'rxjs';
 export class HomePage {
 
   constructor(private httpClient: HttpClient){
-    this.get()
-
+    
       this.form.get('VarrerTodaRede')?.valueChanges.subscribe((checked) => {
       const inicio = this.form.get('inicio');
       const fim = this.form.get('fim');
@@ -41,12 +39,12 @@ export class HomePage {
   onSubmit(Threads: number){
     this.form.controls.qntThreads.setValue(Threads)
     if(this.form.invalid) this.form.markAllAsTouched()
-    console.log(this.form.value)
+    this.post(this.form.value)
   }
 
   
   post(form: any) {
-  const url = 'http://localhost:7041/api/produtos'; // Use HTTPS e o endpoint correto
+  const url = 'http://localhost:5066/api/controller'; // Use HTTPS e o endpoint correto
 
   this.httpClient.post(url, form).subscribe({
     next: (response) => {
@@ -60,8 +58,7 @@ export class HomePage {
 
 
   get(){
-   
-    const url = 'http://localhost:5264/GetIps'
+    const url = 'http://localhost:5066/api/controller'
     this.httpClient.get(url).subscribe({
       
     })

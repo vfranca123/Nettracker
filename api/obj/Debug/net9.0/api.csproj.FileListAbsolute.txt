@@ -30,3 +30,7 @@ C:\Users\vitor\OneDrive\Desktop\Nettracker\api\obj\Debug\net9.0\refint\api.dll
 C:\Users\vitor\OneDrive\Desktop\Nettracker\api\obj\Debug\net9.0\api.pdb
 C:\Users\vitor\OneDrive\Desktop\Nettracker\api\obj\Debug\net9.0\api.genruntimeconfig.cache
 C:\Users\vitor\OneDrive\Desktop\Nettracker\api\obj\Debug\net9.0\ref\api.dll
+C:\Users\vitor\OneDrive\Desktop\Nettracker\api\obj\Debug\net9.0\api.sourcelink.json
+C:\Users\vitor\OneDrive\Desktop\Nettracker\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\vitor\OneDrive\Desktop\Nettracker\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\vitor\OneDrive\Desktop\Nettracker\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
