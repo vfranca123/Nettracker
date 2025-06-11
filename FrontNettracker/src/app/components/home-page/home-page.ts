@@ -11,29 +11,36 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 })
 export class HomePage {
 
-  constructor(private httpClient: HttpClient){
-    
-      this.form.get('VarrerTodaRede')?.valueChanges.subscribe((checked) => {
-      const inicio = this.form.get('inicio');
-      const fim = this.form.get('fim');
-      if (checked) {
-        inicio?.disable();
-        fim?.disable();
-       
-      } else {
-        inicio?.enable();
-        fim?.enable();
-      }
-    });
+constructor(private httpClient: HttpClient){
+  this.form.get('VarrerTodaRede')?.valueChanges.subscribe((checked) => {
+    const inicio = this.form.get('inicio');
+    const fim = this.form.get('fim');
+    if (checked) {
+      inicio?.disable();
+      fim?.disable();
+    } else {
+      inicio?.enable();
+      fim?.enable();
+    }
+  });
+
+ 
+  if (this.form.controls['VarrerTodaRede'].value === true) {
+    this.form.controls['inicio'].setValue(0);
+    this.form.controls['fim'].setValue(255);
   }
+}
+
 
   form = new FormGroup({
     IpRede: new FormControl('',[Validators.required]),
-    inicio: new FormControl('',[Validators.required]),
-    fim: new FormControl('',[Validators.required]),
+    inicio: new FormControl<number>(0,[Validators.required]),
+    fim: new FormControl<number>(0,[Validators.required]),
     VarrerTodaRede: new FormControl(false),
     qntThreads: new FormControl(0) //se a quantidade de trheads for igual a 7 é multithreads dinamicas 
   })
+
+  
   
   
   onSubmit(Threads: number){

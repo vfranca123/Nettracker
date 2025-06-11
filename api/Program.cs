@@ -1,7 +1,32 @@
+using Api.Models;
+//testando caso da varredura sem threade deu certo
+/*
+class Program
+{
+    static void Main(string[] args)
+    {
+
+        //testando caso da varredura sem thread
+        var rede = new Rede();
+
+        rede.inicio = 1;
+        rede.fim = 10;
+
+        rede.gatilhoVarrefuraSemThread();
+        rede.ExibirResultados();
+
+        
+        
+        
+    }
+}*/
 
 using Microsoft.OpenApi.Models; // IMPORTANTE para Swagger
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
 
 // 1. Adiciona os serviços dos controladores (os atendentes da API)
 builder.Services.AddControllers();
@@ -46,4 +71,3 @@ app.MapControllers();
 
 // 8. Inicia o servidor
 app.Run();
-
