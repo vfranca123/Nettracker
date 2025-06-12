@@ -20,13 +20,18 @@ namespace Api.controller
         public IActionResult PostRede([FromBodyAttribute] Rede rede)
         { // uma função do tipo  "IActionResult" que recebera os atributos do corpo e tentara colocaro em um objeto com nome "rede" da classe Rede que esta em models 
           // onde a logica é desenvolvida 
-
-
-            return Ok(new
+            
+            if (rede.VarrerTodaRede == true)
             {
-                mensagem = "dados recebidos",
-                dados = rede
-            });
+                rede.fim = 255;
+                rede.inicio = 0;
+            }
+            
+            rede.gatilhoVarrefuraSemThread();
+            GrupoDeIps resposta = rede.RetornaResultado();
+            
+            
+            return Ok(rede.RetornaResultado());
         }
 
         [HttpGet]

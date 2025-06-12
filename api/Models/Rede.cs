@@ -2,19 +2,20 @@ using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 
+
 namespace Api.Models
 {
     public class Rede
     {
-        public string IpRede { get; set; } = "";
+        public string IpRede { get; set; } = "10.3.192.";
         public int inicio { get; set; } = 0;
         public int fim { get; set; } = 0;
         public bool VarrerTodaRede { get; set; }
         public int qntThreads { get; set; }
-
-        public string IpBase = "10.3.192."; 
         public int[] resultadoDaBusca;
         public Stopwatch cronometro;
+
+        public GrupoDeIps ListaDePrintar= new GrupoDeIps();
 
         public void InicializarVarreduda()
         {
@@ -42,7 +43,7 @@ namespace Api.Models
             int posicaoVarreduraVetor = 1;
             for (int i = this.inicio; i <= this.fim; i++)
             {
-                ipParaPingar = IpBase + i.ToString();
+                ipParaPingar = IpRede + i.ToString();
                 try
                 {
                     resposta = ping.Send(ipParaPingar);
@@ -55,7 +56,6 @@ namespace Api.Models
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erro ao fazer ping em {ipParaPingar}: {ex.Message}");
                     return;
                 }
             }
@@ -67,19 +67,27 @@ namespace Api.Models
         {
             InicializarVarreduda();
             varreduraSemThread();
+           
         }
 
         //feito para teste da varredura simples
-        public void ExibirResultados()
+        public GrupoDeIps RetornaResultado()
         {
             for (int i = 0; i < resultadoDaBusca.Length; i += 2)
             {
-                string ip = IpBase + resultadoDaBusca[i];
-                string status = resultadoDaBusca[i+1] == 1 ? "Ativo" :
-                                resultadoDaBusca[i+1] == 0 ? "Inativo" : "Desconhecido";
-                Console.WriteLine($"{ip} => {status}");
+                Ip ip = new Ip(); 
+                ip.ip = IpRede + resultadoDaBusca[i];
+                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" :
+                                resultadoDaBusca[i + 1] == 0 ? "Inativo" : "Desconhecido";
+                
+                
+                
+
+                ListaDePrintar.ListaDeIps.Add(ip);
+
             }
-            Console.WriteLine($"Tempo total: {cronometro.ElapsedMilliseconds} ms");
+            ListaDePrintar.Tempo = cronometro.ElapsedMilliseconds;
+            return ListaDePrintar;
         }
     }
 }

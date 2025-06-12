@@ -5,7 +5,7 @@
         <div class="col-md-4">
           <label class="form-label m-2">Classe C da rede a varrer:</label>
           <input type="text" class="form-control m-2" formControlName="IpRede">
-          <small class="text-muted">Formato: 255</small>
+          <small class="text-muted">Formato: 10.3.192.</small>
           <small class="text-warning" *ngIf="form.controls.IpRede.invalid && form.controls.IpRede.touched">Campo deve ser preenchido</small>
         </div>
 
@@ -29,22 +29,6 @@
           <div class="col-md-3">
             <p>Versão 0: <br>sem threads</p>
             <button class="btn btn-primary btn-sm" (click)="onSubmit(0)">Iniciar</button>
-            
-          </div>
-          <div class="col-md-3">
-            <p>Versão 1:<br> single thread</p>
-            <button class="btn btn-primary btn-sm" (click)="onSubmit(1)">Iniciar</button>
-            
-          </div>
-          <div class="col-md-3">
-            <p>Versão 2:<br> multi threads</p>
-            <button class="btn btn-primary btn-sm" (click)="onSubmit(2)">Iniciar</button>
-            
-          </div>
-          <div class="col-md-3">
-            <p>Versão 3: multi threads dinâmicas</p> <!--se a quantidade de trheads for igual a 7 é multithreads dinamicas-->
-             <button class="btn btn-primary btn-sm" (click)="onSubmit(7)">Iniciar</button> 
-           
           </div>
         </div>
 
@@ -59,15 +43,21 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border">
-            <td>10.3.192.1</td>
-            <td>Ativo</td>
-          </tr>
-          <tr class="border">
-            <td>10.3.192.2</td>
-            <td>Inativo</td>
-          </tr>
-          
+          @for(ip of resultado.listaDeIps; track ip){
+            @if(ip.status){
+            <tr class="border">
+              <td>{{ ip.ip}}</td>
+              <td>{{ip.status}}</td>
+            </tr> 
+            }@else
+             {
+              <tr class="border">
+              <td>{{ ip.ip}}</td>
+              <td>{{ip.status}}</td>
+            </tr> 
+            } 
+          }
+
         </tbody>
       </table>
     </div>
@@ -75,7 +65,7 @@
 
 
     <div class="status-bar mt-3">
-      Status sua rede: <strong>não identificado</strong> | Progresso varredura: &nbsp;&nbsp;&nbsp;&nbsp;Concluído em: 9 seg. Timer fechado
+      Status sua rede: <strong>não identificado</strong> | Progresso varredura: &nbsp;&nbsp;&nbsp;&nbsp;Concluído em: {{resultado.tempo}} ms. Timer fechado
     </div>
   </div>
 
