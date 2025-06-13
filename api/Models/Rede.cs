@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using System.Threading;
 
 
 namespace Api.Models
@@ -15,8 +16,10 @@ namespace Api.Models
         public int[] resultadoDaBusca;
         public Stopwatch cronometro;
 
-        public GrupoDeIps ListaDePrintar= new GrupoDeIps();
+        public GrupoDeIps ListaDePrintar = new GrupoDeIps();
 
+
+        //Criação e contrução da varredura -----------------------------------------------------------------------
         public void InicializarVarreduda()
         {
             int quantidadeAVarrer = this.fim - this.inicio + 1;
@@ -34,14 +37,14 @@ namespace Api.Models
             cronometro.Start();
         }
 
-        public void varreduraSemThread()
+        public void varreduraIndividual(int inicio, int fim, int indiceVetorInicio)
         {
             Ping ping = new Ping();
             PingReply resposta;
             string ipParaPingar = "";
 
-            int posicaoVarreduraVetor = 1;
-            for (int i = this.inicio; i <= this.fim; i++)
+            int posicaoVarreduraVetor = indiceVetorInicio;
+            for (int i = inicio; i <= fim; i++)
             {
                 ipParaPingar = IpRede + i.ToString();
                 try
@@ -54,8 +57,9 @@ namespace Api.Models
 
                     posicaoVarreduraVetor += 2;
                 }
-                catch (Exception ex)
+                catch (Exception err)
                 {
+                    Console.WriteLine("Erro:"+ err);
                     return;
                 }
             }
@@ -63,31 +67,50 @@ namespace Api.Models
             cronometro.Stop();
         }
 
+        //Varredura isolado -----------------------------------------------------------------------------------
         public void gatilhoVarrefuraSemThread()
         {
             InicializarVarreduda();
-            varreduraSemThread();
-           
+            varreduraIndividual(this.inicio, this.fim, 0);
+
         }
 
         //feito para teste da varredura simples
         public GrupoDeIps RetornaResultado()
         {
+            ListaDePrintar.ListaDeIps.Clear();
+
             for (int i = 0; i < resultadoDaBusca.Length; i += 2)
             {
-                Ip ip = new Ip(); 
+                Ip ip = new Ip();
                 ip.ip = IpRede + resultadoDaBusca[i];
-                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" :
-                                resultadoDaBusca[i + 1] == 0 ? "Inativo" : "Desconhecido";
-                
-                
-                
-
+                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" : "Inativo";
+                                
                 ListaDePrintar.ListaDeIps.Add(ip);
 
             }
             ListaDePrintar.Tempo = cronometro.ElapsedMilliseconds;
             return ListaDePrintar;
         }
+
+        //Varredura com uma threa a mais ----------------------------------------------------------------------
+        public void varreduraComThreads()
+        {
+            int divisaoTarefas = this.fim - this.inicio + 1;
+            divisaoTarefas = divisaoTarefas / 2;
+            int meioInicio = this.inicio + divisaoTarefas;
+
+            Thread t = new Thread(() => varreduraIndividual(this.inicio + divisaoTarefas, this.fim,(meioInicio - this.inicio) * 2)); //a função lambda cria uma função que sera executada dentro da thread 
+            varreduraIndividual(this.inicio, divisaoTarefas-1 , 0);
+            t.Start();
+        }
+        
+        public void gatilhoVarreduraComUmaThread()
+        {
+            InicializarVarreduda();
+            varreduraComThreads();
+        }
+
+        
     }
 }

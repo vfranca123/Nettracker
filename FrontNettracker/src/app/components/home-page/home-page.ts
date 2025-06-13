@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-home-page',
   imports: [ReactiveFormsModule, FormsModule, CommonModule],
   templateUrl: './home-page.html',
-  styleUrls: ['./home-page.css']  // plural aqui
+  styleUrls: ['./home-page.css'] 
 })
 export class HomePage {
   carregando = false;
@@ -47,7 +47,7 @@ export class HomePage {
     this.form.controls.qntThreads.setValue(Threads);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      return;  // PARA A EXECUÇÃO SE FORM INVÁLIDO
+      return;  
     }
     this.post(this.form.value);
   }

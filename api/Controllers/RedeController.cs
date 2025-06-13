@@ -26,9 +26,13 @@ namespace Api.controller
                 rede.fim = 255;
                 rede.inicio = 0;
             }
-            
-            rede.gatilhoVarrefuraSemThread();
-            GrupoDeIps resposta = rede.RetornaResultado();
+
+            if (rede.qntThreads == 0) {
+                rede.gatilhoVarrefuraSemThread();    
+            }
+            if (rede.qntThreads == 1) {
+                rede.gatilhoVarreduraComUmaThread();    
+            }
             
             
             return Ok(rede.RetornaResultado());
