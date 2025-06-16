@@ -35,6 +35,11 @@
             <p>Versão 1: <br>Uma threads</p>
             <button class="btn btn-primary btn-sm" (click)="onSubmit(1)">Iniciar</button>
           </div>
+
+          <div class="col-md-3">
+            <p>Versão 2: <br>MultThreads</p>
+            <button class="btn btn-primary btn-sm" (click)="onSubmit(4)">Iniciar</button>
+          </div>
         </div>
 
       </form>
@@ -51,7 +56,7 @@
           @for(ip of resultado.listaDeIps; track ip){
             @if(ip.status){
             <tr class="border">
-              <td>{{ ip.ip}}</td>
+              <td>{{ip.ip}}</td>
               <td>{{ip.status}}</td>
             </tr> 
             } 

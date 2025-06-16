@@ -13,7 +13,7 @@ namespace Api.Models
         public int fim { get; set; } = 0;
         public bool VarrerTodaRede { get; set; }
         public int qntThreads { get; set; }
-        public int[] resultadoDaBusca;
+        public int[] resultadoDaBusca = [];
         public Stopwatch cronometro;
 
         public GrupoDeIps ListaDePrintar = new GrupoDeIps();
@@ -60,12 +60,12 @@ namespace Api.Models
                 }
                 catch (Exception err)
                 {
-                    Console.WriteLine("Erro:"+ err);
+                    Console.WriteLine("Erro:" + err);
                     return;
                 }
             }
 
-            cronometro.Stop();
+
         }
 
         //Varredura isolado -----------------------------------------------------------------------------------
@@ -73,6 +73,7 @@ namespace Api.Models
         {
             InicializarVarreduda();
             varreduraIndividual(this.inicio, this.fim, 0);
+            cronometro.Stop();
 
         }
 
@@ -85,7 +86,7 @@ namespace Api.Models
                 Ip ip = new Ip();
                 ip.ip = IpRede + resultadoDaBusca[i];
                 ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" : "--";
-                                
+
                 ListaDePrintar.ListaDeIps.Add(ip);
 
             }
@@ -97,20 +98,53 @@ namespace Api.Models
         public void varreduraComThreads()
         {
             int divisaoTarefas = this.fim - this.inicio + 1;
-            divisaoTarefas = divisaoTarefas / 2;
-            int meioInicio = this.inicio + divisaoTarefas;
+            divisaoTarefas = divisaoTarefas / qntThreads;
+            int resto = divisaoTarefas % qntThreads;
 
-            Thread t = new Thread(() => varreduraIndividual(this.inicio + divisaoTarefas, this.fim,(meioInicio - this.inicio) * 2)); //a função lambda cria uma função que sera executada dentro da thread 
-            varreduraIndividual(this.inicio, divisaoTarefas-1 , 0);
-            t.Start();
+            int ipAtual = inicio;
+            int indiceVetor = 0;
+            Thread[] threads = new Thread[qntThreads];
+
+
+            for (int i = 0; i < qntThreads; i++)
+            {
+                int blocoInicial = ipAtual;
+                int blocoTamanho = divisaoTarefas + (1 < resto ? 1 : 0); // distribuira o resto não feito 
+                int blocoFim = blocoInicial + blocoTamanho - 1;
+                int vetorInicial = indiceVetor;
+                threads[i] = new Thread(() => varreduraIndividual(blocoInicial, blocoFim, vetorInicial));
+                varreduraIndividual(this.inicio, divisaoTarefas - 1, 0);
+                threads[i].Start();
+
+                ipAtual += blocoTamanho;
+                indiceVetor += blocoTamanho * 2;
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Join(); // Espera todas as threads terminarem
+            }
+
+            cronometro.Stop();
         }
-        
-        public void gatilhoVarreduraComUmaThread()
+
+        public void gatilhoVarreduraComUmaThreadMais()
         {
             InicializarVarreduda();
             varreduraComThreads();
+            cronometro.Stop();
         }
 
-        
+
+        //Varredura com threads dinamicas ----------------------------------------------------------------------
+        public void varreduraComThreadsDinamicas()
+        {
+            int divisaoTarefas = this.fim - this.inicio + 1;
+            divisaoTarefas = divisaoTarefas / qntThreads;
+            int resto = divisaoTarefas % qntThreads;
+
+            int ipAtual = inicio;
+            int indiceVetor = 0;
+        }
     }
 }

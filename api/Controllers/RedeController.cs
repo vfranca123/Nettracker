@@ -30,8 +30,8 @@ namespace Api.controller
             if (rede.qntThreads == 0) {
                 rede.gatilhoVarrefuraSemThread();    
             }
-            if (rede.qntThreads == 1) {
-                rede.gatilhoVarreduraComUmaThread();    
+            else{
+                rede.gatilhoVarreduraComUmaThreadMais();    
             }
             
             
