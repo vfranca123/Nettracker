@@ -51,9 +51,10 @@ namespace Api.Models
                 {
                     resposta = ping.Send(ipParaPingar);
                     if (resposta.Status == IPStatus.Success)
-                        resultadoDaBusca[posicaoVarreduraVetor] = 1;
+                        resultadoDaBusca[posicaoVarreduraVetor + 1] = 1;
                     else
-                        resultadoDaBusca[posicaoVarreduraVetor] = 0;
+                        resultadoDaBusca[posicaoVarreduraVetor + 1] = 0;
+
 
                     posicaoVarreduraVetor += 2;
                 }
@@ -75,7 +76,6 @@ namespace Api.Models
 
         }
 
-        //feito para teste da varredura simples
         public GrupoDeIps RetornaResultado()
         {
             ListaDePrintar.ListaDeIps.Clear();
@@ -84,7 +84,7 @@ namespace Api.Models
             {
                 Ip ip = new Ip();
                 ip.ip = IpRede + resultadoDaBusca[i];
-                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" : "Inativo";
+                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" : "--";
                                 
                 ListaDePrintar.ListaDeIps.Add(ip);
 
