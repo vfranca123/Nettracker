@@ -25,15 +25,20 @@ export class HomePage {
 
   constructor(private httpClient: HttpClient) {
     this.form.get('VarrerTodaRede')?.valueChanges.subscribe((checked) => {
-      const inicio = this.form.get('inicio');
-      const fim = this.form.get('fim');
-      if (checked) {
-        inicio?.disable();
-        fim?.disable();
-      } else {
-        inicio?.enable();
-        fim?.enable();
-      }
+    const inicio = this.form.get('inicio');
+    const fim = this.form.get('fim');
+
+    if (checked) {
+      // Se marcar, define os valores e desativa os campos
+      inicio?.setValue(0);
+      fim?.setValue(255);
+      inicio?.disable();
+      fim?.disable();
+    } else {
+      // Se desmarcar, reativa os campos para que o usuário possa editar
+      inicio?.enable();
+      fim?.enable();
+    }
     });
 
     if (this.form.controls['VarrerTodaRede'].value === true) {
@@ -41,21 +46,32 @@ export class HomePage {
       this.form.controls['fim'].setValue(255);
     }
     this.form.controls['IpRede'].setValue('10.3.192.');
+    
   }
 
   onSubmit(Threads: number) {
     this.form.controls.qntThreads.setValue(Threads);
+
+    if (this.form.get('VarrerTodaRede')?.value) {
+      // Força os valores no envio
+      this.form.controls['inicio'].setValue(0);
+      this.form.controls['fim'].setValue(255);
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;  
     }
-    this.post(this.form.value);
+
+    const formData = this.form.getRawValue(); // <--- isso pega os campos desabilitados também
+    this.post(formData);
   }
 
  
   async post(form: any) {
     const url = 'http://localhost:5066/api/controller';
     this.carregando = true;
+    
     try {
       const response: any = await firstValueFrom(
       this.httpClient.post(url, form, { responseType: 'json' })

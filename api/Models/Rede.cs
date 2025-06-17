@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Threading;
-
+using System.Collections.Generic;
 
 namespace Api.Models
 {
@@ -13,138 +13,125 @@ namespace Api.Models
         public int fim { get; set; } = 0;
         public bool VarrerTodaRede { get; set; }
         public int qntThreads { get; set; }
-        public int[] resultadoDaBusca = [];
-        public Stopwatch cronometro;
 
-        public GrupoDeIps ListaDePrintar = new GrupoDeIps();
-
-
-        //Criação e contrução da varredura -----------------------------------------------------------------------
-        public void InicializarVarreduda()
-        {
-            int quantidadeAVarrer = this.fim - this.inicio + 1;
-            resultadoDaBusca = new int[2 * quantidadeAVarrer];
-
-            int contador = this.inicio;
-            for (int i = 0; i < 2 * quantidadeAVarrer; i += 2)
-            {
-                resultadoDaBusca[i] = contador;
-                resultadoDaBusca[i + 1] = -1;
-                contador++;
-            }
-
-            cronometro = new Stopwatch();
-            cronometro.Start();
-        }
-
-        public void varreduraIndividual(int inicio, int fim, int indiceVetorInicio)
+        // --- Varredura Individual ---
+        public GrupoDeIps varreduraIndividual(int inicio, int fim, int indiceVetorInicio)
         {
             Ping ping = new Ping();
             PingReply resposta;
-            string ipParaPingar = "";
+            GrupoDeIps resultadoDaBusca = new GrupoDeIps();
 
-            int posicaoVarreduraVetor = indiceVetorInicio;
             for (int i = inicio; i <= fim; i++)
             {
-                ipParaPingar = IpRede + i.ToString();
+                Ip newIp = new Ip();
+                string ipParaPingar = IpRede + i.ToString();
+                newIp.ip = ipParaPingar;
                 try
                 {
                     resposta = ping.Send(ipParaPingar);
-                    if (resposta.Status == IPStatus.Success)
-                        resultadoDaBusca[posicaoVarreduraVetor + 1] = 1;
-                    else
-                        resultadoDaBusca[posicaoVarreduraVetor + 1] = 0;
-
-
-                    posicaoVarreduraVetor += 2;
+                    newIp.status = resposta.Status == IPStatus.Success ? 1 : 0;
+                    resultadoDaBusca.ListaDeIps.Add(newIp);
                 }
                 catch (Exception err)
                 {
-                    Console.WriteLine("Erro:" + err);
-                    return;
+                    Console.WriteLine("Erro: " + err);
+                    break;
                 }
             }
 
-
+            return resultadoDaBusca;
         }
 
-        //Varredura isolado -----------------------------------------------------------------------------------
-        public void gatilhoVarrefuraSemThread()
+        public GrupoDeIps GatilhovarreduraIndividual()
         {
-            InicializarVarreduda();
-            varreduraIndividual(this.inicio, this.fim, 0);
+            Stopwatch cronometro = Stopwatch.StartNew();
+            GrupoDeIps resultadoFinal = varreduraIndividual(inicio, fim, 0);
             cronometro.Stop();
-
+            resultadoFinal.Tempo = cronometro.ElapsedMilliseconds / 1000.0;
+            return resultadoFinal;
         }
 
-        public GrupoDeIps RetornaResultado()
+        // --- Varredura com Threads Fixas ---
+        public GrupoDeIps varreduraComThreads()
         {
-            ListaDePrintar.ListaDeIps.Clear();
+            Stopwatch cronometro = Stopwatch.StartNew();
 
-            for (int i = 0; i < resultadoDaBusca.Length; i += 2)
-            {
-                Ip ip = new Ip();
-                ip.ip = IpRede + resultadoDaBusca[i];
-                ip.status = resultadoDaBusca[i + 1] == 1 ? "Ativo" : "--";
-
-                ListaDePrintar.ListaDeIps.Add(ip);
-
-            }
-            ListaDePrintar.Tempo = cronometro.ElapsedMilliseconds;
-            return ListaDePrintar;
-        }
-
-        //Varredura com uma threa a mais ----------------------------------------------------------------------
-        public void varreduraComThreads()
-        {
-            int divisaoTarefas = this.fim - this.inicio + 1;
-            divisaoTarefas = divisaoTarefas / qntThreads;
-            int resto = divisaoTarefas % qntThreads;
+            int totalIps = fim - inicio + 1;
+            int tamanhoBloco = totalIps / qntThreads;
+            int resto = totalIps % qntThreads;
 
             int ipAtual = inicio;
-            int indiceVetor = 0;
             Thread[] threads = new Thread[qntThreads];
-
+            GrupoDeIps[] resultadosParciais = new GrupoDeIps[qntThreads];
 
             for (int i = 0; i < qntThreads; i++)
             {
                 int blocoInicial = ipAtual;
-                int blocoTamanho = divisaoTarefas + (1 < resto ? 1 : 0); // distribuira o resto não feito 
+                int blocoTamanho = tamanhoBloco + (i < resto ? 1 : 0);
                 int blocoFim = blocoInicial + blocoTamanho - 1;
-                int vetorInicial = indiceVetor;
-                threads[i] = new Thread(() => varreduraIndividual(blocoInicial, blocoFim, vetorInicial));
-                varreduraIndividual(this.inicio, divisaoTarefas - 1, 0);
-                threads[i].Start();
+                int indiceCopia = i;
 
+                threads[i] = new Thread(() =>
+                {
+                    resultadosParciais[indiceCopia] = varreduraIndividual(blocoInicial, blocoFim, 0);
+                });
+
+                threads[i].Start();
                 ipAtual += blocoTamanho;
-                indiceVetor += blocoTamanho * 2;
             }
 
             foreach (var thread in threads)
+                thread.Join();
+
+            GrupoDeIps resultadoFinal = new GrupoDeIps();
+            foreach (var resultado in resultadosParciais)
             {
-                thread.Join(); // Espera todas as threads terminarem
+                if (resultado != null)
+                    resultadoFinal.ListaDeIps.AddRange(resultado.ListaDeIps);
             }
 
             cronometro.Stop();
+            resultadoFinal.Tempo = cronometro.ElapsedMilliseconds / 1000.0;
+            return resultadoFinal;
         }
 
-        public void gatilhoVarreduraComUmaThreadMais()
+        // --- Varredura com Threads Dinâmicas ---
+        public GrupoDeIps varreduraComThreadsDinamicas()
         {
-            InicializarVarreduda();
-            varreduraComThreads();
+            Stopwatch cronometro = Stopwatch.StartNew();
+
+            List<Thread> threads = new List<Thread>();
+            List<GrupoDeIps> resultados = new List<GrupoDeIps>();
+            object lockObj = new object();
+
+            for (int i = inicio; i <= fim; i += 2)
+            {
+                int ipInicio = i;
+                int ipFim = Math.Min(i + 1, fim);
+
+                Thread t = new Thread(() =>
+                {
+                    GrupoDeIps resultado = varreduraIndividual(ipInicio, ipFim, 0);
+                    lock (lockObj)
+                    {
+                        resultados.Add(resultado);
+                    }
+                });
+
+                threads.Add(t);
+                t.Start();
+            }
+
+            foreach (var thread in threads)
+                thread.Join();
+
+            GrupoDeIps resultadoFinal = new GrupoDeIps();
+            foreach (var resultado in resultados)
+                resultadoFinal.ListaDeIps.AddRange(resultado.ListaDeIps);
+
             cronometro.Stop();
-        }
-
-
-        //Varredura com threads dinamicas ----------------------------------------------------------------------
-        public void varreduraComThreadsDinamicas()
-        {
-            int divisaoTarefas = this.fim - this.inicio + 1;
-            divisaoTarefas = divisaoTarefas / qntThreads;
-            int resto = divisaoTarefas % qntThreads;
-
-            int ipAtual = inicio;
-            int indiceVetor = 0;
+            resultadoFinal.Tempo = cronometro.ElapsedMilliseconds / 1000.0;
+            return resultadoFinal;
         }
     }
 }

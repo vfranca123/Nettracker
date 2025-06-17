@@ -1,11 +1,13 @@
 using Api.Models;
+using System;
+using Api.Models;
+
+using Api.Models;
+using System;
 
 using Microsoft.OpenApi.Models; // IMPORTANTE para Swagger
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
 
 // 1. Adiciona os serviços dos controladores (os atendentes da API)
 builder.Services.AddControllers();
@@ -51,4 +53,5 @@ app.MapControllers();
 
 // 8. Inicia o servidor
 app.Run();
+
 
