@@ -4,9 +4,12 @@
       <form class="row g-3 align-items-center" [formGroup]="form" >
         <div class="col-md-4">
           <label class="form-label m-2">Classe C da rede a varrer:</label>
-          <input type="text" class="form-control m-2" formControlName="IpRede">
           <small class="text-muted">Formato: 10.3.192.</small>
+          <input type="text" class="form-control m-2" formControlName="IpRede">
+          
+          <label class="form-label m-2">Quantidade de threads:</label>
           <small class="text-warning" *ngIf="form.controls.IpRede.invalid && form.controls.IpRede.touched">Campo deve ser preenchido</small>
+          <input type="number" class="form-control w-25 m-2" formControlName="qntThreads">
         </div>
 
         <div class="col-md-4">
@@ -20,6 +23,7 @@
             <input type="number" class="form-control w-25 me-2"  formControlName="inicio">
              <small class="text-warning" *ngIf="form.controls.inicio.invalid && form.controls.inicio.touched">Campo deve ser preenchido</small>
             <label class="me-2">Fim:</label>
+
             <input type="number" class="form-control w-25" formControlName="fim">
              <small class="text-warning" *ngIf="form.controls.fim.invalid && form.controls.fim.touched">Campo deve ser preenchido</small>
           </div>

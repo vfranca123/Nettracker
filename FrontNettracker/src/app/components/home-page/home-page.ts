@@ -49,21 +49,28 @@ export class HomePage {
     
   }
 
-  onSubmit(Threads: number) {
-    this.form.controls.qntThreads.setValue(Threads);
-
+  onSubmit(tipo: number) {
     if (this.form.get('VarrerTodaRede')?.value) {
-      // Força os valores no envio
       this.form.controls['inicio'].setValue(0);
       this.form.controls['fim'].setValue(255);
     }
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      return;  
+      return;
     }
 
-    const formData = this.form.getRawValue(); // <--- isso pega os campos desabilitados também
+    const formData = this.form.getRawValue(); // pega todos os valores, inclusive os desabilitados
+
+    // Validação para MultThreads
+    if (tipo === 4) {
+      const qntThreads = formData.qntThreads;
+
+      if (!qntThreads || qntThreads <= 0) {
+        return;
+      }
+    }
+
     this.post(formData);
   }
 

@@ -13,6 +13,8 @@ namespace Api.Models
         public int fim { get; set; } = 0;
         public bool VarrerTodaRede { get; set; }
         public int qntThreads { get; set; }
+        
+        
 
         // --- Varredura Individual ---
         public GrupoDeIps varreduraIndividual(int inicio, int fim, int indiceVetorInicio)
